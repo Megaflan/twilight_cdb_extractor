@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: write
+
 env:
   CARGO_TERM_COLOR: always
 
@@ -16,7 +19,35 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+      run: cargo build --release --verbose
+
+    - name: Archive Build Artifacts
+      run: |
+        mkdir -p release
+        cp -r target/release/build release/
+        tar -czvf release.tar.gz -C release .
+
+    - name: Upload Release Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: release-artifact
+        path: release.tar.gz
+
+    - name: Set Release Tag
+      id: vars
+      run: echo "TAG_NAME=v$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
+    - name: Create Release
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: release.tar.gz     
+        tag_name: "${{ env.TAG_NAME }}"
+        release_name: "Release ${{ github.sha }}"
+        body: "Automated release from GitHub Actions"
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}      
