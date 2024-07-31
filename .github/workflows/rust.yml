@@ -26,7 +26,7 @@ jobs:
     - name: Archive Build Artifacts
       run: |
         mkdir -p release
-        cp target/release/build release/
+        cp -r target/release/build release/
         tar -czvf release.tar.gz -C release .
 
     - name: Upload Release Artifact
