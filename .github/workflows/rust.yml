@@ -20,3 +20,10 @@ jobs:
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
+    - name: Create Release
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        TAG_NAME="v$(date +'%Y%m%d%H%M%S')"
+        gh release create $TAG_NAME --title "Release $TAG_NAME" --notes "Automated release from GitHub Actions"
