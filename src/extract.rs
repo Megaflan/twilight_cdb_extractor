@@ -6,6 +6,7 @@ use std::io::Read;
 pub struct Entry {
     pub offset: u32,
     pub length: u32,
+    pub data: Vec<u8>
 }
 
 pub fn read_file(file_path: &std::path::Path) -> io::Result<Vec<u8>> {
@@ -14,21 +15,24 @@ pub fn read_file(file_path: &std::path::Path) -> io::Result<Vec<u8>> {
     Ok(stream)
 }
 
-pub fn process_entries(stream: Vec<u8>) -> Vec<Entry> {
+pub fn process_entries(stream: Vec<u8>, compressed: bool) -> Vec<Entry> {
     let mut entries: Vec<Entry> = Vec::new();
     let mut stream_pos: usize = 0;
 
     loop {
-        let offset = u16::from_le_bytes([stream[stream_pos], stream[stream_pos + 1]]) as u32;
-        let length = u16::from_le_bytes([stream[stream_pos + 2], stream[stream_pos + 3]]) as u32;
+        let offset = u16::from_le_bytes([stream[stream_pos], stream[stream_pos + 1]]) as u32 * 0x800;
+        let length = u16::from_le_bytes([stream[stream_pos + 2], stream[stream_pos + 3]]) as u32 * 0x800;
 
         if offset == 0 && length == 0 {
             break;
         }
 
+        let data = stream[offset as usize..(offset + length) as usize].to_vec();
+
         entries.push(Entry {
-            offset: offset * 0x800,
-            length: length * 0x800,
+            offset: offset,
+            length: length,
+            data
         });
 
         stream_pos = stream_pos + 4;
