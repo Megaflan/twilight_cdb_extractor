@@ -39,9 +39,11 @@ jobs:
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       uses: softprops/action-gh-release@v1
       with:
-        files: release.tar.gz
+        files: release.tar.gz        
+        tag_name: v${{ github.sha }}
+        release_name: "Release ${{ github.sha }}"
+        body: "Automated release from GitHub Actions"
+        draft: false
+        prerelease: false
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        TAG_NAME="v$(date +'%Y%m%d%H%M%S')"
-        gh release create $TAG_NAME --title "Release $TAG_NAME" --notes "Automated release from GitHub Actions"
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}      
