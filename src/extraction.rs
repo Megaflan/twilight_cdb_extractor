@@ -2,6 +2,8 @@ use std::io;
 use std::fs::File;
 use std::io::Read;
 
+use crate::compression;
+
 #[derive(Debug)]
 pub struct Entry {
     pub offset: u32,
@@ -27,7 +29,11 @@ pub fn process_entries(stream: Vec<u8>, compressed: bool) -> Vec<Entry> {
             break;
         }
 
-        let data = stream[offset as usize..(offset + length) as usize].to_vec();
+        let mut data = stream[offset as usize..(offset + length) as usize].to_vec();
+
+        if compressed {
+            data = compression::decompress(data);
+        }
 
         entries.push(Entry {
             offset: offset,
