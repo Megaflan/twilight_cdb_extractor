@@ -3,10 +3,11 @@
 Twilight CDB Extractor is a program made to extract CDB files from Twilight Syndrome.
 
 ## Usage
-To run this program, you need to specify the file you want to analyze as a command-line argument.
-
-```sh
-cargo run <cdb_file>
+```
+Usage: {} <mode> <file>
+Modes:
+-e: Extracts the CDB file.
+-i: Repacks the CDB file.
 ```
 
 ## Requirements
