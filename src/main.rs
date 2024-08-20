@@ -1,12 +1,13 @@
 mod extraction;
 mod insertion;
+mod binary_helper;
 
 use std::fs::File;
 use std::io::Write;
 use std::{env, fs, io};
 use std::path::Path;
 
-use extraction::{read_file, process_entries};
+use extraction::read_file;
 use insertion::repack;
 
 fn main() -> io::Result<()> {
@@ -25,15 +26,14 @@ fn main() -> io::Result<()> {
     match mode.as_str() {
         "-e" => {
             // Extraction
-            let stream = read_file(&path)?;
-            let entries = process_entries(stream);
+            let entries = read_file(&path);
             // Write files
             let filename_no_ext = Path::new(path).file_stem().unwrap().to_str().unwrap();
             let dir_path = Path::new(filename_no_ext);
             fs::create_dir_all(&dir_path).expect("Failed to create directory");
 
             for entry in entries {
-                let output_path = dir_path.join(format!("{}_{}.bin", filename_no_ext, format!("{:08}", entry.offset)));
+                let output_path = dir_path.join(format!("{}_{}.{}", filename_no_ext, format!("{:08}", entry.offset), &entry.format));
                 let mut output_file = File::create(&output_path).expect("Failed to create output file");
                 output_file.write_all(&entry.data).expect("Failed to write to output file");
             }
