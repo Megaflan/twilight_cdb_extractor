@@ -54,6 +54,8 @@ fn identify_format(data: Vec<u8>) -> String {
         "psdb".to_string() //PSDB (TIM Container)
     } else if data.starts_with(&[0x54, 0x4D, 0x53, 0x20]) {
         "tms".to_string() //TMS (TIM Container)
+    } else if data.starts_with(&[0x00, 0x10, 0x80, 0x00]) {
+        "tim".to_string() //TIM (Sony PlayStation Typical image Format )
     } else {        
         "bin".to_string() //BIN (Binary Data)
     }
