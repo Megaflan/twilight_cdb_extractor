@@ -17,15 +17,15 @@ pub fn repack(entries: ReadDir, dir_path: &str) -> File {
     // Preparations
     for entry_result in entries {
         let entry = entry_result.expect("Failed to read directory entry");
-        let file_name = entry
+        let mut file_name = entry
             .file_name()
             .into_string()
             .expect("Failed to convert file name to string");
+        file_name.truncate(file_name.len() - 4);
         let offset_str = file_name
             .split('_')
             .nth(1)
-            .expect("Invalid file name format")
-            .replace(".bin", "");
+            .expect("Invalid file name format");
         let offset = offset_str
             .parse::<u32>()
             .expect("Failed to parse offset from file name");
